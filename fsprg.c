@@ -60,28 +60,28 @@ static gcry_mpi_t mpi_import(const void *buf, size_t buflen)
 static void uint64_export(void *buf, size_t buflen, uint64_t x)
 {
   assert(buflen == 8);
-  ((unsigned char *)buf)[0] = (x >> 56) & 0xff;
-  ((unsigned char *)buf)[1] = (x >> 48) & 0xff;
-  ((unsigned char *)buf)[2] = (x >> 40) & 0xff;
-  ((unsigned char *)buf)[3] = (x >> 32) & 0xff;
-  ((unsigned char *)buf)[4] = (x >> 24) & 0xff;
-  ((unsigned char *)buf)[5] = (x >> 16) & 0xff;
-  ((unsigned char *)buf)[6] = (x >>  8) & 0xff;
-  ((unsigned char *)buf)[7] = (x >>  0) & 0xff;
+  ((uint8_t*) buf)[0] = (x >> 56) & 0xff;
+  ((uint8_t*) buf)[1] = (x >> 48) & 0xff;
+  ((uint8_t*) buf)[2] = (x >> 40) & 0xff;
+  ((uint8_t*) buf)[3] = (x >> 32) & 0xff;
+  ((uint8_t*) buf)[4] = (x >> 24) & 0xff;
+  ((uint8_t*) buf)[5] = (x >> 16) & 0xff;
+  ((uint8_t*) buf)[6] = (x >>  8) & 0xff;
+  ((uint8_t*) buf)[7] = (x >>  0) & 0xff;
 }
 
 static uint64_t uint64_import(const void *buf, size_t buflen)
 {
   assert(buflen == 8);
   return
-    (uint64_t)(((unsigned char *)buf)[0]) << 56 |
-    (uint64_t)(((unsigned char *)buf)[1]) << 48 |
-    (uint64_t)(((unsigned char *)buf)[2]) << 40 |
-    (uint64_t)(((unsigned char *)buf)[3]) << 32 |
-    (uint64_t)(((unsigned char *)buf)[4]) << 24 |
-    (uint64_t)(((unsigned char *)buf)[5]) << 16 |
-    (uint64_t)(((unsigned char *)buf)[6]) <<  8 |
-    (uint64_t)(((unsigned char *)buf)[7]) <<  0;
+    (uint64_t)(((uint8_t*) buf)[0]) << 56 |
+    (uint64_t)(((uint8_t*) buf)[1]) << 48 |
+    (uint64_t)(((uint8_t*) buf)[2]) << 40 |
+    (uint64_t)(((uint8_t*) buf)[3]) << 32 |
+    (uint64_t)(((uint8_t*) buf)[4]) << 24 |
+    (uint64_t)(((uint8_t*) buf)[5]) << 16 |
+    (uint64_t)(((uint8_t*) buf)[6]) <<  8 |
+    (uint64_t)(((uint8_t*) buf)[7]) <<  0;
 }
 
 /* deterministically generate from seed/idx a string of buflen pseudorandom bytes */
@@ -118,7 +118,7 @@ static void det_randomize(void *buf, size_t buflen, const void *seed, size_t see
 static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, uint32_t idx)
 {
   size_t buflen = bits / 8;
-  unsigned char buf[buflen];
+  uint8_t buf[buflen];
   gcry_mpi_t p;
 
   assert(bits % 8 == 0);
@@ -139,7 +139,7 @@ static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, uint
 static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen, uint32_t idx, int secpar)
 {
   size_t buflen = secpar / 8;
-  unsigned char buf[buflen];
+  uint8_t buf[buflen];
   gcry_mpi_t x;
 
   det_randomize(buf, buflen, seed, seedlen, idx);
@@ -225,22 +225,22 @@ size_t FSPRG_stateinbytes(int _secpar)
 static void store_secpar(void *buf, uint16_t secpar)
 {
   secpar = secpar / 16 - 1;
-  ((unsigned char *)buf)[0] = (secpar >> 8) & 0xff;
-  ((unsigned char *)buf)[1] = (secpar >> 0) & 0xff;
+  ((uint8_t*) buf)[0] = (secpar >> 8) & 0xff;
+  ((uint8_t*) buf)[1] = (secpar >> 0) & 0xff;
 }
 
 static uint16_t read_secpar(const void *buf)
 {
   uint16_t secpar;
   secpar =
-    (uint16_t)(((unsigned char *)buf)[0]) << 8 |
-    (uint16_t)(((unsigned char *)buf)[1]) << 0;
+    (uint16_t)(((uint8_t*) buf)[0]) << 8 |
+    (uint16_t)(((uint8_t*) buf)[1]) << 0;
   return 16 * (secpar + 1);
 }
 
 void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _secpar)
 {
-  unsigned char iseed[FSPRG_RECOMMENDED_SEEDLEN];
+  uint8_t iseed[FSPRG_RECOMMENDED_SEEDLEN];
   gcry_mpi_t n, p, q;
   uint16_t secpar;
   VALIDATE_SECPAR(_secpar);

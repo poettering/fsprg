@@ -8,7 +8,7 @@ static void printkey(void *key, size_t keylen)
 {
   int i;
   for(i = 0; i < keylen; i++)
-    printf("%02x ", ((unsigned char*)key)[i]);
+    printf("%02x ", ((uint8_t*)key)[i]);
   printf("\n");
 }
 
@@ -27,12 +27,12 @@ int main(void)
   size_t seedlen = FSPRG_RECOMMENDED_SEEDLEN;   // arbitrary seed length
   size_t statelen = FSPRG_stateinbytes(SECPAR);
   size_t keylen = 10;                          // arbitrary output key length
-  unsigned char msk[msklen];
-  unsigned char mpk[mpklen];
-  unsigned char seed[seedlen];
-  unsigned char istate[statelen];
-  unsigned char sstate[statelen];
-  unsigned char key[keylen];
+  uint8_t msk[msklen];
+  uint8_t mpk[mpklen];
+  uint8_t seed[seedlen];
+  uint8_t istate[statelen];
+  uint8_t sstate[statelen];
+  uint8_t key[keylen];
   int i;
 
   printf("Generating master keys (this may take some time)..."); fflush(stdout);
