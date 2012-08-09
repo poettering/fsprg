@@ -1,3 +1,6 @@
+#ifndef __fsprgh__
+#define __fsprgh__
+
 /*
  * fsprg v0.1  -  (seekable) forward-secure pseudorandom generator
  * Copyright (C) 2012 B. Poettering
@@ -47,3 +50,5 @@ uint64_t FSPRG_GetEpoch(void *state);
 void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, size_t seedlen);
 
 void FSPRG_GetKey(void *key, size_t keylen, uint32_t idx, const void *state);
+
+#endif
