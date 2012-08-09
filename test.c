@@ -14,9 +14,9 @@ static void printkey(void *key, size_t keylen)
 
 #define SECPAR FSPRG_RECOMMENDED_SECPAR        // for normal use
 //#define SECPAR 160                            // for debugging purposes
-#define DELTA (u_int64_t)1E3
+#define DELTA (uint64_t)1E3
 
-int main(void) 
+int main(void)
 {
   assert(gcry_check_version("1.4.5"));
   gcry_control(GCRYCTL_DISABLE_SECMEM, 0);
@@ -37,35 +37,35 @@ int main(void)
 
   printf("Generating master keys (this may take some time)..."); fflush(stdout);
   FSPRG_GenMK(msk, mpk, NULL, 0, SECPAR);
-  printf(" done!\n"); 
-  
+  printf(" done!\n");
+
   gcry_randomize(seed, seedlen, GCRY_STRONG_RANDOM); /* optionally take seed from QR code */
   FSPRG_GenState0(istate, mpk, seed, seedlen);
 
-  printf("key_{%8lld}:              ", FSPRG_GetEpoch(istate)); 
-  FSPRG_GetKey(key, keylen, 0, istate); 
+  printf("key_{%8lld}:              ", FSPRG_GetEpoch(istate));
+  FSPRG_GetKey(key, keylen, 0, istate);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, DELTA, msk, seed, seedlen);
-  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate)); 
-  FSPRG_GetKey(key, keylen, 0, sstate); 
+  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate));
+  FSPRG_GetKey(key, keylen, 0, sstate);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
   printf("key_{%8lld} (iterated):   ", FSPRG_GetEpoch(istate));
-  FSPRG_GetKey(key, keylen, 0, istate); 
+  FSPRG_GetKey(key, keylen, 0, istate);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, 2 * DELTA, msk, seed, seedlen);
-  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate)); 
-  FSPRG_GetKey(key, keylen, 0x1234, sstate); 
+  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate));
+  FSPRG_GetKey(key, keylen, 0x1234, sstate);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
   printf("key_{%8lld} (iterated):   ", FSPRG_GetEpoch(istate));
-  FSPRG_GetKey(key, keylen, 0x1234, istate); 
+  FSPRG_GetKey(key, keylen, 0x1234, istate);
   printkey(key, keylen);
 
   return 0;

@@ -1,6 +1,6 @@
 /*
  * fsprg v0.1  -  (seekable) forward-secure pseudorandom generator
- * Copyright (C) 2012 B. Poettering 
+ * Copyright (C) 2012 B. Poettering
  * Contact: fsprg@point-at-infinity.org
  *
  * This library is free software; you can redistribute it and/or
@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301  USA
  *
  */
@@ -57,7 +57,7 @@ static gcry_mpi_t mpi_import(const void *buf, size_t buflen)
   return h;
 }
 
-static void uint64_export(void *buf, size_t buflen, u_int64_t x)
+static void uint64_export(void *buf, size_t buflen, uint64_t x)
 {
   assert(buflen == 8);
   ((unsigned char *)buf)[0] = (x >> 56) & 0xff;
@@ -70,26 +70,26 @@ static void uint64_export(void *buf, size_t buflen, u_int64_t x)
   ((unsigned char *)buf)[7] = (x >>  0) & 0xff;
 }
 
-static u_int64_t uint64_import(const void *buf, size_t buflen)
+static uint64_t uint64_import(const void *buf, size_t buflen)
 {
   assert(buflen == 8);
   return
-    (u_int64_t)(((unsigned char *)buf)[0]) << 56 |
-    (u_int64_t)(((unsigned char *)buf)[1]) << 48 |
-    (u_int64_t)(((unsigned char *)buf)[2]) << 40 |
-    (u_int64_t)(((unsigned char *)buf)[3]) << 32 |
-    (u_int64_t)(((unsigned char *)buf)[4]) << 24 |
-    (u_int64_t)(((unsigned char *)buf)[5]) << 16 |
-    (u_int64_t)(((unsigned char *)buf)[6]) <<  8 |
-    (u_int64_t)(((unsigned char *)buf)[7]) <<  0;
+    (uint64_t)(((unsigned char *)buf)[0]) << 56 |
+    (uint64_t)(((unsigned char *)buf)[1]) << 48 |
+    (uint64_t)(((unsigned char *)buf)[2]) << 40 |
+    (uint64_t)(((unsigned char *)buf)[3]) << 32 |
+    (uint64_t)(((unsigned char *)buf)[4]) << 24 |
+    (uint64_t)(((unsigned char *)buf)[5]) << 16 |
+    (uint64_t)(((unsigned char *)buf)[6]) <<  8 |
+    (uint64_t)(((unsigned char *)buf)[7]) <<  0;
 }
 
 /* deterministically generate from seed/idx a string of buflen pseudorandom bytes */
-static void det_randomize(void *buf, size_t buflen, const void *seed, size_t seedlen, u_int32_t idx)
+static void det_randomize(void *buf, size_t buflen, const void *seed, size_t seedlen, uint32_t idx)
 {
   gcry_md_hd_t hd, hd2;
   size_t olen, cpylen;
-  u_int32_t ctr;
+  uint32_t ctr;
 
   olen = gcry_md_get_algo_dlen(RND_HASH);
   gcry_md_open(&hd, RND_HASH, 0);
@@ -115,7 +115,7 @@ static void det_randomize(void *buf, size_t buflen, const void *seed, size_t see
 }
 
 /* deterministically generate from seed/idx a prime of length `bits' that is 3 (mod 4) */
-static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, u_int32_t idx)
+static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, uint32_t idx)
 {
   size_t buflen = bits / 8;
   unsigned char buf[buflen];
@@ -131,12 +131,12 @@ static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, u_in
   p = mpi_import(buf, buflen);
   while(gcry_prime_check(p, 0))
     gcry_mpi_add_ui(p, p, 4);
-  
+
   return p;
 }
 
 /* deterministically generate from seed/idx a quadratic residue (mod n) */
-static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen, u_int32_t idx, int secpar)
+static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen, uint32_t idx, int secpar)
 {
   size_t buflen = secpar / 8;
   unsigned char buf[buflen];
@@ -151,7 +151,7 @@ static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen
 }
 
 /* compute 2^m (mod phi(p)), for a prime p */
-static gcry_mpi_t twopowmodphi(u_int64_t m, const gcry_mpi_t p)
+static gcry_mpi_t twopowmodphi(uint64_t m, const gcry_mpi_t p)
 {
   gcry_mpi_t phi, r;
   int n;
@@ -159,20 +159,20 @@ static gcry_mpi_t twopowmodphi(u_int64_t m, const gcry_mpi_t p)
   phi = gcry_mpi_new(0);
   gcry_mpi_sub_ui(phi, p, 1);
 
-  for(n = 0; ((u_int64_t)1 << n) <= m; n++); /* count number of used bits in m */
+  for(n = 0; ((uint64_t)1 << n) <= m; n++); /* count number of used bits in m */
 
   r = gcry_mpi_new(0);
   gcry_mpi_set_ui(r, 1);
   while(n) { /* square and multiply algorithm for fast exponentiation */
     n--;
     gcry_mpi_mulm(r, r, r, phi);
-    if (m & ((u_int64_t)1 << n)) {
+    if (m & ((uint64_t)1 << n)) {
       gcry_mpi_add(r, r, r);
       if (gcry_mpi_cmp(r, phi) >= 0)
 	gcry_mpi_sub(r, r, phi);
     }
   }
-  
+
   gcry_mpi_release(phi);
   return r;
 }
@@ -222,19 +222,19 @@ size_t FSPRG_stateinbytes(int _secpar)
   return 2 + 2 * _secpar / 8 + 8; /* to store header,n,x,epoch */
 }
 
-static void store_secpar(void *buf, u_int16_t secpar)
+static void store_secpar(void *buf, uint16_t secpar)
 {
   secpar = secpar / 16 - 1;
   ((unsigned char *)buf)[0] = (secpar >> 8) & 0xff;
   ((unsigned char *)buf)[1] = (secpar >> 0) & 0xff;
 }
 
-static u_int16_t read_secpar(const void *buf)
+static uint16_t read_secpar(const void *buf)
 {
-  u_int16_t secpar;
-  secpar = 
-    (u_int16_t)(((unsigned char *)buf)[0]) << 8 |
-    (u_int16_t)(((unsigned char *)buf)[1]) << 0;
+  uint16_t secpar;
+  secpar =
+    (uint16_t)(((unsigned char *)buf)[0]) << 8 |
+    (uint16_t)(((unsigned char *)buf)[1]) << 0;
   return 16 * (secpar + 1);
 }
 
@@ -242,7 +242,7 @@ void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _se
 {
   unsigned char iseed[FSPRG_RECOMMENDED_SEEDLEN];
   gcry_mpi_t n, p, q;
-  u_int16_t secpar;
+  uint16_t secpar;
   VALIDATE_SECPAR(_secpar);
   secpar = _secpar;
 
@@ -274,7 +274,7 @@ void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _se
 void FSPRG_GenState0(void *state, const void *mpk, const void *seed, size_t seedlen)
 {
   gcry_mpi_t n, x;
-  u_int16_t secpar;
+  uint16_t secpar;
 
   secpar = read_secpar(mpk + 0);
   n = mpi_import(mpk + 2, secpar / 8);
@@ -291,8 +291,8 @@ void FSPRG_GenState0(void *state, const void *mpk, const void *seed, size_t seed
 void FSPRG_Evolve(void *state)
 {
   gcry_mpi_t n, x;
-  u_int16_t secpar;
-  u_int64_t epoch;
+  uint16_t secpar;
+  uint64_t epoch;
 
   secpar = read_secpar(state + 0);
   n = mpi_import(state + 2 + 0 * secpar / 8, secpar / 8);
@@ -309,17 +309,17 @@ void FSPRG_Evolve(void *state)
   gcry_mpi_release(x);
 }
 
-u_int64_t FSPRG_GetEpoch(void *state)
+uint64_t FSPRG_GetEpoch(void *state)
 {
-  u_int16_t secpar;
+  uint16_t secpar;
   secpar = read_secpar(state + 0);
   return uint64_import(state + 2 + 2 * secpar / 8, 8);
 }
 
-void FSPRG_Seek(void *state, u_int64_t epoch, const void *msk, const void *seed, size_t seedlen)
+void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, size_t seedlen)
 {
   gcry_mpi_t p, q, n, x, xp, xq, kp, kq, xm;
-  u_int16_t secpar;
+  uint16_t secpar;
 
   secpar = read_secpar(msk + 0);
   p  = mpi_import(msk + 2 + 0 * (secpar / 2) / 8, (secpar / 2) / 8);
@@ -355,9 +355,9 @@ void FSPRG_Seek(void *state, u_int64_t epoch, const void *msk, const void *seed,
   gcry_mpi_release(xm);
 }
 
-void FSPRG_GetKey(void *key, size_t keylen, u_int32_t idx, const void *state)
+void FSPRG_GetKey(void *key, size_t keylen, uint32_t idx, const void *state)
 {
-  u_int16_t secpar;
+  uint16_t secpar;
 
   secpar = read_secpar(state + 0);
   det_randomize(key, keylen, state + 2, 2 * secpar / 8 + 8, idx);
