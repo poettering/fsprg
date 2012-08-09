@@ -42,29 +42,29 @@ int main(void)
   gcry_randomize(seed, seedlen, GCRY_STRONG_RANDOM); /* optionally take seed from QR code */
   FSPRG_GenState0(istate, mpk, seed, seedlen);
 
-  printf("key_{%8lld}:              ", FSPRG_GetEpoch(istate));
+  printf("key_{%8llu}:              ", (unsigned long long) FSPRG_GetEpoch(istate));
   FSPRG_GetKey(key, keylen, 0, istate);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, DELTA, msk, seed, seedlen);
-  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate));
+  printf("key_{%8llu} (after seek): ", (unsigned long long) FSPRG_GetEpoch(sstate));
   FSPRG_GetKey(key, keylen, 0, sstate);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
-  printf("key_{%8lld} (iterated):   ", FSPRG_GetEpoch(istate));
+  printf("key_{%8llu} (iterated):   ", (unsigned long long) FSPRG_GetEpoch(istate));
   FSPRG_GetKey(key, keylen, 0, istate);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, 2 * DELTA, msk, seed, seedlen);
-  printf("key_{%8lld} (after seek): ", FSPRG_GetEpoch(sstate));
+  printf("key_{%8llu} (after seek): ", (unsigned long long) FSPRG_GetEpoch(sstate));
   FSPRG_GetKey(key, keylen, 0x1234, sstate);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
-  printf("key_{%8lld} (iterated):   ", FSPRG_GetEpoch(istate));
+  printf("key_{%8llu} (iterated):   ", (unsigned long long) FSPRG_GetEpoch(istate));
   FSPRG_GetKey(key, keylen, 0x1234, istate);
   printkey(key, keylen);
 
