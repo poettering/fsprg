@@ -43,29 +43,29 @@ int main(void)
   FSPRG_GenState0(istate, mpk, seed, seedlen);
 
   printf("key_{%8llu}:              ", (unsigned long long) FSPRG_GetEpoch(istate));
-  FSPRG_GetKey(key, keylen, 0, istate);
+  FSPRG_GetKey(istate, key, keylen, 0);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, DELTA, msk, seed, seedlen);
   printf("key_{%8llu} (after seek): ", (unsigned long long) FSPRG_GetEpoch(sstate));
-  FSPRG_GetKey(key, keylen, 0, sstate);
+  FSPRG_GetKey(sstate, key, keylen, 0);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
   printf("key_{%8llu} (iterated):   ", (unsigned long long) FSPRG_GetEpoch(istate));
-  FSPRG_GetKey(key, keylen, 0, istate);
+  FSPRG_GetKey(istate, key, keylen, 0);
   printkey(key, keylen);
 
   FSPRG_Seek(sstate, 2 * DELTA, msk, seed, seedlen);
   printf("key_{%8llu} (after seek): ", (unsigned long long) FSPRG_GetEpoch(sstate));
-  FSPRG_GetKey(key, keylen, 0x1234, sstate);
+  FSPRG_GetKey(sstate, key, keylen, 0x1234);
   printkey(key, keylen);
 
   for(i = 0; i < DELTA; i++)
     FSPRG_Evolve(istate);
   printf("key_{%8llu} (iterated):   ", (unsigned long long) FSPRG_GetEpoch(istate));
-  FSPRG_GetKey(key, keylen, 0x1234, istate);
+  FSPRG_GetKey(istate, key, keylen, 0x1234);
   printkey(key, keylen);
 
   return 0;

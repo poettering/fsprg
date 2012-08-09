@@ -357,7 +357,7 @@ void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, 
   gcry_mpi_release(xm);
 }
 
-void FSPRG_GetKey(void *key, size_t keylen, uint32_t idx, const void *state)
+void FSPRG_GetKey(const void *state, void *key, size_t keylen, uint32_t idx)
 {
   uint16_t secpar;
 
