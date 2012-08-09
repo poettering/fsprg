@@ -171,7 +171,7 @@ static gcry_mpi_t twopowmodphi(uint64_t m, const gcry_mpi_t p)
     if (m & ((uint64_t)1 << n)) {
       gcry_mpi_add(r, r, r);
       if (gcry_mpi_cmp(r, phi) >= 0)
-	gcry_mpi_sub(r, r, phi);
+        gcry_mpi_sub(r, r, phi);
     }
   }
 
