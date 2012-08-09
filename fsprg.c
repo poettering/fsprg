@@ -210,6 +210,21 @@ static void CRT_compose(gcry_mpi_t *x, const gcry_mpi_t xp, const gcry_mpi_t xq,
   gcry_mpi_release(u);
 }
 
+static void initialize_libgcrypt(void)
+{
+  const char *p;
+  if (gcry_control(GCRYCTL_INITIALIZATION_FINISHED_P))
+    return;
+
+  p = gcry_check_version("1.4.5");
+  assert(p);
+
+  /* Turn off "secmem". Clients which whish to make use of this
+   * feature should initialize the library manually */
+  gcry_control(GCRYCTL_DISABLE_SECMEM);
+  gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0);
+}
+
 /******************************************************************************/
 
 size_t FSPRG_mskinbytes(int _secpar)
@@ -254,6 +269,8 @@ void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _se
   VALIDATE_SECPAR(_secpar);
   secpar = _secpar;
 
+  initialize_libgcrypt();
+
   if (! seed) {
     gcry_randomize(iseed, FSPRG_RECOMMENDED_SEEDLEN, GCRY_STRONG_RANDOM);
     seed = iseed;
@@ -284,6 +301,8 @@ void FSPRG_GenState0(void *state, const void *mpk, const void *seed, size_t seed
   gcry_mpi_t n, x;
   uint16_t secpar;
 
+  initialize_libgcrypt();
+
   secpar = read_secpar(mpk + 0);
   n = mpi_import(mpk + 2, secpar / 8);
   x = gensquare(n, seed, seedlen, RND_GEN_X, secpar);
@@ -301,6 +320,8 @@ void FSPRG_Evolve(void *state)
   gcry_mpi_t n, x;
   uint16_t secpar;
   uint64_t epoch;
+
+  initialize_libgcrypt();
 
   secpar = read_secpar(state + 0);
   n = mpi_import(state + 2 + 0 * secpar / 8, secpar / 8);
@@ -328,6 +349,8 @@ void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, 
 {
   gcry_mpi_t p, q, n, x, xp, xq, kp, kq, xm;
   uint16_t secpar;
+
+  initialize_libgcrypt();
 
   secpar = read_secpar(msk + 0);
   p  = mpi_import(msk + 2 + 0 * (secpar / 2) / 8, (secpar / 2) / 8);
@@ -366,6 +389,8 @@ void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, 
 void FSPRG_GetKey(const void *state, void *key, size_t keylen, uint32_t idx)
 {
   uint16_t secpar;
+
+  initialize_libgcrypt();
 
   secpar = read_secpar(state + 0);
   det_randomize(key, keylen, state + 2, 2 * secpar / 8 + 8, idx);
