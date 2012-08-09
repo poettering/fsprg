@@ -48,7 +48,7 @@ void FSPRG_GenState0(void *state, const void *mpk, const void *seed, size_t seed
 
 void FSPRG_Evolve(void *state);
 
-uint64_t FSPRG_GetEpoch(void *state);
+uint64_t FSPRG_GetEpoch(const void *state);
 
 /* Seek to any arbitrary state (by providing msk together with seed from GenState0). */
 void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, size_t seedlen);

@@ -311,7 +311,7 @@ void FSPRG_Evolve(void *state)
   gcry_mpi_release(x);
 }
 
-uint64_t FSPRG_GetEpoch(void *state)
+uint64_t FSPRG_GetEpoch(const void *state)
 {
   uint16_t secpar;
   secpar = read_secpar(state + 0);
