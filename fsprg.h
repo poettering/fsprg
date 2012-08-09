@@ -26,6 +26,10 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FSPRG_RECOMMENDED_SECPAR 1536
 #define FSPRG_RECOMMENDED_SEEDLEN (96/8)
 
@@ -50,5 +54,9 @@ uint64_t FSPRG_GetEpoch(void *state);
 void FSPRG_Seek(void *state, uint64_t epoch, const void *msk, const void *seed, size_t seedlen);
 
 void FSPRG_GetKey(void *key, size_t keylen, uint32_t idx, const void *state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
