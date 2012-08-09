@@ -38,22 +38,27 @@
 
 static void mpi_export(void *buf, size_t buflen, const gcry_mpi_t x)
 {
+  int len;
+  size_t nwritten;
+
   assert(gcry_mpi_cmp_ui(x, 0) >= 0);
-  int len = (gcry_mpi_get_nbits(x) + 7) / 8;
-  size_t NWRITTEN;
+  len = (gcry_mpi_get_nbits(x) + 7) / 8;
   assert(len <= buflen);
   memset(buf, 0, buflen);
-  gcry_mpi_print(GCRYMPI_FMT_USG, buf + (buflen - len), len, &NWRITTEN, x);
-  assert(NWRITTEN == len);
+  gcry_mpi_print(GCRYMPI_FMT_USG, buf + (buflen - len), len, &nwritten, x);
+  assert(nwritten == len);
 }
 
 static gcry_mpi_t mpi_import(const void *buf, size_t buflen)
 {
   gcry_mpi_t h;
+  int len;
+
   gcry_mpi_scan(&h, GCRYMPI_FMT_USG, buf, buflen, NULL);
-  int len = (gcry_mpi_get_nbits(h) + 7) / 8;
+  len = (gcry_mpi_get_nbits(h) + 7) / 8;
   assert(len <= buflen);
   assert(gcry_mpi_cmp_ui(h, 0) >= 0);
+
   return h;
 }
 
@@ -192,6 +197,7 @@ static void CRT_decompose(gcry_mpi_t *xp, gcry_mpi_t *xq, const gcry_mpi_t x, co
 static void CRT_compose(gcry_mpi_t *x, const gcry_mpi_t xp, const gcry_mpi_t xq, const gcry_mpi_t p, const gcry_mpi_t q)
 {
   gcry_mpi_t a, u;
+
   a = gcry_mpi_new(0);
   u = gcry_mpi_new(0);
   *x = gcry_mpi_new(0);
