@@ -1,4 +1,4 @@
-CFLAGS = -O2 -Wall
+CFLAGS = -O2 -Wall -Wextra
 LIBS = -lgcrypt
 
 all: test

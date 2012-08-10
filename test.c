@@ -6,7 +6,7 @@
 
 static void printkey(void *key, size_t keylen)
 {
-  int i;
+  size_t i;
   for(i = 0; i < keylen; i++)
     printf("%02x ", ((uint8_t*)key)[i]);
   printf("\n");
@@ -33,7 +33,7 @@ int main(void)
   uint8_t istate[statelen];
   uint8_t sstate[statelen];
   uint8_t key[keylen];
-  int i;
+  uint64_t i;
 
   printf("Generating master keys (this may take some time)..."); fflush(stdout);
   FSPRG_GenMK(msk, mpk, NULL, 0, SECPAR);
