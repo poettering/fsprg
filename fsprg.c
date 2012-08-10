@@ -266,6 +266,7 @@ void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _se
   uint8_t iseed[FSPRG_RECOMMENDED_SEEDLEN];
   gcry_mpi_t n, p, q;
   uint16_t secpar;
+
   VALIDATE_SECPAR(_secpar);
   secpar = _secpar;
 
@@ -280,18 +281,23 @@ void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _se
   p = genprime3mod4(secpar / 2, seed, seedlen, RND_GEN_P);
   q = genprime3mod4(secpar / 2, seed, seedlen, RND_GEN_Q);
 
-  store_secpar(msk + 0, secpar);
-  mpi_export(msk + 2 + 0 * (secpar / 2) / 8, (secpar / 2) / 8, p);
-  mpi_export(msk + 2 + 1 * (secpar / 2) / 8, (secpar / 2) / 8, q);
+  if (msk) {
+    store_secpar(msk + 0, secpar);
+    mpi_export(msk + 2 + 0 * (secpar / 2) / 8, (secpar / 2) / 8, p);
+    mpi_export(msk + 2 + 1 * (secpar / 2) / 8, (secpar / 2) / 8, q);
+  }
 
-  n = gcry_mpi_new(0);
-  gcry_mpi_mul(n, p, q);
-  assert(gcry_mpi_get_nbits(n) == secpar);
+  if (mpk) {
+    n = gcry_mpi_new(0);
+    gcry_mpi_mul(n, p, q);
+    assert(gcry_mpi_get_nbits(n) == secpar);
 
-  store_secpar(mpk + 0, secpar);
-  mpi_export(mpk + 2, secpar / 8, n);
+    store_secpar(mpk + 0, secpar);
+    mpi_export(mpk + 2, secpar / 8, n);
 
-  gcry_mpi_release(n);
+    gcry_mpi_release(n);
+  }
+
   gcry_mpi_release(p);
   gcry_mpi_release(q);
 }
