@@ -138,7 +138,7 @@ static gcry_mpi_t genprime3mod4(int bits, const void *seed, size_t seedlen, uint
 }
 
 /* deterministically generate from seed/idx a quadratic residue (mod n) */
-static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen, uint32_t idx, int secpar) {
+static gcry_mpi_t gensquare(const gcry_mpi_t n, const void *seed, size_t seedlen, uint32_t idx, unsigned secpar) {
         size_t buflen = secpar / 8;
         uint8_t buf[buflen];
         gcry_mpi_t x;
@@ -219,17 +219,17 @@ static void initialize_libgcrypt(void) {
 
 /******************************************************************************/
 
-size_t FSPRG_mskinbytes(int _secpar) {
+size_t FSPRG_mskinbytes(unsigned _secpar) {
         VALIDATE_SECPAR(_secpar);
         return 2 + 2 * (_secpar / 2) / 8; /* to store header,p,q */
 }
 
-size_t FSPRG_mpkinbytes(int _secpar) {
+size_t FSPRG_mpkinbytes(unsigned _secpar) {
         VALIDATE_SECPAR(_secpar);
         return 2 + _secpar / 8; /* to store header,n */
 }
 
-size_t FSPRG_stateinbytes(int _secpar) {
+size_t FSPRG_stateinbytes(unsigned _secpar) {
         VALIDATE_SECPAR(_secpar);
         return 2 + 2 * _secpar / 8 + 8; /* to store header,n,x,epoch */
 }
@@ -248,7 +248,7 @@ static uint16_t read_secpar(const void *buf) {
         return 16 * (secpar + 1);
 }
 
-void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int _secpar) {
+void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, unsigned _secpar) {
         uint8_t iseed[FSPRG_RECOMMENDED_SEEDLEN];
         gcry_mpi_t n, p, q;
         uint16_t secpar;

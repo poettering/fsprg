@@ -35,12 +35,12 @@ extern "C" {
 #define FSPRG_RECOMMENDED_SECPAR 1536
 #define FSPRG_RECOMMENDED_SEEDLEN (96/8)
 
-size_t FSPRG_mskinbytes(int secpar);
-size_t FSPRG_mpkinbytes(int secpar);
-size_t FSPRG_stateinbytes(int secpar);
+size_t FSPRG_mskinbytes(unsigned secpar);
+size_t FSPRG_mpkinbytes(unsigned secpar);
+size_t FSPRG_stateinbytes(unsigned secpar);
 
 /* Setup msk and mpk. Providing seed != NULL makes this algorithm deterministic. */
-void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, int secpar);
+void FSPRG_GenMK(void *msk, void *mpk, const void *seed, size_t seedlen, unsigned secpar);
 
 /* Initialize state deterministically in dependence on seed. */
 /* Note: in case one wants to run only one GenState0 per GenMK it is safe to use
